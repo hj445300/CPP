@@ -1,0 +1,1057 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <title>Panel Configuration Files</title>
+    <link rel="StyleSheet" href="../../../common/p3d_style.css" type="text/css">
+</head>
+<body>
+    <div id="header-sdk">
+        <div id="header-fill">
+        </div>
+    </div>
+    <div id="content">
+        <a name="top"></a>
+        <div class="article-bodycopy">
+            <h1><a name="Panel Configuration Files"></a>Panel Configuration Files</h1>
+            <hr>
+            <!---Related Links--->
+            <table border="0" cellspacing="10" cellpadding="0" align="right" summary="SummaryTBD">
+                <tr>
+                    <td>
+                        <span class="TOCsubhead">Contents</span>
+                        <table border="0" cellspacing="5" cellpadding="0" class="RelatedLinkTableThin" summary="SummaryTBD">
+                            <tr class="article-bodycopy">
+                                <td>
+                                    <br>
+                                    Most panel configuration file contains the following sections:
+                                    <br>
+                                    <br>
+                                    <ul>
+                                        <li><a href="#window titles">[Window titles]</a></li>
+                                        <li><a href="#windowXX and vcockpitXX">[windowXX] and [vcockpitXX]</a></li>
+                                        <li><a href="#default view">[Default View]</a></li>
+                                        <li><a href="#color">[Color]</a></li>
+                                        <li><a href="#views">[Views]</a></li>
+                                        <li><a href="#fltsim">[fltsim]</a></li>
+                                    </ul>
+                                    <br>
+                                    Alternatively the panel can use aliasing, and have a single section:<br>
+                                    <br>
+                                    <ul>
+                                        <li><a href="#fltsim">[fltsim] section</a></li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!---Table of Contents--->
+                <tr>
+                    <td>
+                        <span class="TOCsubhead">Related Links</span>
+                        <table border="0" cellspacing="5" cellpadding="0" class="RelatedLinkTableThin" summary="SummaryTBD">
+                            <tr class="article-bodycopy">
+                                <td>
+                                    <ul>
+                                        <li><a href="../../sdk_overview.html">SDK Overview</a></li>
+                                        <li><a href="../gauges/references/help_ids.html">HelpIDs</a></li>
+                                        <li><a href="../gauges/gauges_overview.html">Programmable Gauges</a></li>
+                                        <li><a href="../gauges/references/tooltips.html">Tooltips</a></li>
+                                        <li><a href="../gauges/references/token_variables.html">Token Variables </a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <h2>Overview</h2>
+            <p>The primary folder used by the panel system is the <b>Panel</b> folder. This folder
+                contains the panel background image files (.bmps) and the panel configuration file
+                (panel.cfg). When a vehicle is loaded into the simulator, it also loads the appropriate
+                panel configuration file. 
+			</p>
+			<br>
+			<p>
+				If there is more than one version of a vehicle and a different panel layout is desired for the alternate version(s), more than
+				one panel folder can be specified. The name of the default panel folder is <b>Panel</b>. Additional panel
+                folders follow the following naming convention: <b>Panel.&lt;name&gt;</b>, where <b>&lt;name&gt;</b> is the value of the <b>panel</b> property specified in the
+				<b>[fltsim.n]</b> section of either the vehicle's 
+				<a href="../../simulation_objects/aircraft_configuration_files.html#fltsim">Aircraft Configuration File</a>
+				or
+				<a href="../../simulation_objects/simulation_object_configuration_files.html#fltsim">Simulation Configuration File</a>.
+            </p>
+			<br>
+            <p><i>For example</i>, the Mooney Bravo ships with <b>Panel</b> and <b>Panel.g1000</b> folders
+                for the regular and glass-cockpit panels. The <b>aircraft.cfg</b> for the Money Bravo has a <b>[fltsim]</b> section for the g1000 variant that defines a <b>panel</b> property
+				set to <b>g1000</b>. This causes the <b>Panel.g1000</b> folder's panel.cfg to be read for this variant instead of the traditional panel.cfg in the <b>Panel</b> folder.</p>
+            <hr>
+            <h3><a name="window titles"></a>[window titles]</h3>
+            <p>The Panel system creates the vehicle's panel windows from the information in this
+                section. The variables&nbsp;are used to set the initial state of each panel window
+                and each interior view. For each WindowNN variable in this section, the Panel system
+                creates a panel window. It starts with Window00 and creates panel windows until
+                it reaches Window63 or until it finds a break in the progression.<br>
+                When creating the panel window, the system looks for corresponding [WindowNN] sections
+                later in the configuration file. After the panel window is created, the gauges listed
+                in the [WindowNN] section are loaded.</p>
+            <h5>Note</h5>
+            <dl>
+                <dd>Use the marks "//" to add a comment, or comment out a line you do not wish to be
+                    processed, in the panel.cfg file.</dd>
+            </dl>
+            <table class="ListTable">
+                <tbody>
+                    <thead>
+                        <th>Property </th>
+                        <th>Description </th>
+                        <th>Examples</th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <b>window00<br>
+                                    to<br>
+                                    windowNN</b>
+                            </td>
+                            <td>
+                                The list of panels for the vehicle. The order in which you assign panel windows
+                                does not matter, so long as you start with window00.
+                                <br>
+                                The string you assign to each WindowNN line (for example, Window02=Radio Stack)
+                                is the title displayed for the panel window in <i>Prepar3D</i> when it is undocked.
+                                The string is also displayed on a submenu menu when you click Instrument Panel on
+                                the Views menu. You should therefore make sure the label you use for each window
+                                is appropriate.
+                            </td>
+                            <td>
+                                <b>Window00=Main Panel</b> <b>Window01=Radio Window02=Fullscreen PFD</b><br>
+                                <b>Window03=Throttle Quadrant</b><br>
+                                <b>Window04=Compass</b><br>
+                                <b>Window05=Mini Panel</b><br>
+                                <br>
+                            </td>
+                        </tr>
+                    </tbody>
+            </tbody></table>
+            <hr>
+            <h3><a name="windowXX and vcockpitXX"></a>[windowXX] and [vcockpitXX]</h3>
+            <p>This section describes a panel window, including&nbsp; its shape, position, properties,
+                the background image, and what gauges belong to the panel. The same structure is
+                used for Virtual Cockpits, with the single addition of the texture parameter.
+            </p>
+            <table class="ListTable">
+                <thead>
+                    <th>Property </th>
+                    <th style="width: 230px;">Description </th>
+                    <th style="width: 348px;">Examples</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td align="undefined" valign="undefined">
+                            <b>file</b>
+                        </td>
+                        <td style="width: 230px;" align="undefined" valign="undefined">
+                            Specifies the bitmap file to load and use for the panel window background (1024
+                            by 768 resolution). This .bmp file must be in the same directory as the Panel.cfg
+                            file.
+                        </td>
+                        <td style="width: 348px;" align="undefined" valign="undefined">
+                            <br>
+                            <b>file=Radio_Stack_bg.bmp</b><br>
+                            <b>file=HBH_713_background.bmp</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>file_1024</b>
+                        </td>
+                        <td style="width: 230px;">
+                            The bitmap file to use when the screen width has been set by the user to more than
+                            800.
+                        </td>
+                        <td style="width: 348px;">
+                            <b>file_1024=panel_background.bmp</b> <b>file_1024=Air2S_background.bmp</b>
+                            <br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>size_mm</b>
+                        </td>
+                        <td style="width: 230px;">
+                            A definition of the unit size used for placing and sizing gauges on this panel.&nbsp;
+                            For example, if the size_mm is 200 x 200 and a gauge's size is 50, 50, it will take
+                            up 1/16th ( &frac14;&nbsp; x&nbsp; &frac14;) of the panel window.&nbsp; If no size_mm
+                            is defined, the size of the panel's background bitmap (not the gauge's background
+                            bitmap) will be used.&nbsp; If no background bitmap is defined (as is often the
+                            case with popup panels that contain only one gauge), a default size of 100 x 100
+                            is used.&nbsp; If <i>window_size</i> is not specified, the size of the window on
+                            screen will be <i>size_mm</i> divided by the <i>size_mm</i> for the first window
+                            specified in the panel.cfg.&nbsp; For example, if the size_mm for a given panel
+                            is 200, 200 and the size_mm for the first panel in the panel.cfg is 1024 x 768,
+                            the given panel would occupy 19% of the screen in the x dimension and 26% in the
+                            y dimension, or a total of 5% of the total screen area.&nbsp;This is not used by 
+                            Scaleform panels.
+                        </td>
+                        <td style="width: 348px;">
+                            <b>size_mm=1024</b><br>
+                            <b>size_mm=1024,768</b><br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>position</b>
+                        </td>
+                        <td style="width: 230px;">
+                            Specifies the relative position of a panel window to the main window. A number from
+                            0 to 8 (as shown below) designates the position of the panel window. If nothing
+                            is specified, 7 is the default, otherwise, one of:<br>
+                            <br>
+                            0 = upper-left corner<br>
+                            1&nbsp;= upper-middle side<br>
+                            2 = upper-right corner<br>
+                            3 = middle-left side<br>
+                            4 = middle<br>
+                            5 = middle-right side<br>
+                            6 = lower-left corner<br>
+                            7 = lower-middle side<br>
+                            8 = lower-right corner.
+                        </td>
+                        <td style="width: 348px;">
+                            <b>position=7</b><br>
+                            <b>position=8</b><br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>visible</b>
+                        </td>
+                        <td style="width: 230px;">
+                            Set to 0 if the panel is not visible by default. The default is 1 (visible).
+                        </td>
+                        <td style="width: 348px;">
+                            <b>visible=1</b><br>
+                            <b>visible=0</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>always_visible</b>
+                        </td>
+                        <td style="width: 230px;">
+                            Set to 1 to enable panel to always display, even when switching views. If panel
+                            is closed it must be manually reopened to once again automatically display when
+                            switching views. The default is 0.
+                        </td>
+                        <td style="width: 348px;">
+                            <b>always_visible=1</b><br>
+                            <b>always_visible=0</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>ident</b>
+                        </td>
+                        <td style="width: 230px;">
+                            Specifies a unique identifier to define the panel window. You must have an ident
+                            for each panel window. Valid entries are the following:<br>
+                            <br>
+                            MAIN_PANEL<br>
+                            MAIN_PANEL_ALTn (where n is 1 to 9)
+                            <br>
+                            THROTTLE_PANEL
+                            <br>
+                            RADIO_STACK_PANEL
+                            <br>
+                            COMPASS_PANEL
+                            <br>
+                            MINI_CONTROLS_PANEL<br>
+                            ANNUNCIATOR_PANEL
+                            <br>
+                            ANNUNCIATOR2_PANEL
+                            <br>
+                            IFR_MAIN_PANEL
+                            <br>
+                            COLLECTIVE_PANEL
+                            <br>
+                            GPS_PANEL
+                            <br>
+                            OVERHEAD_PANEL<br>
+                            PARKING_BRAKE_PANEL<br>
+                            FLAPS_TRIM_PANEL<br>
+                            FUEL_PANEL<br>
+                            ELECTRICAL_PANEL<br>
+                            TRIM_PANEL<br>
+                            LANDING_GEAR_PANEL<br>
+                            MISC_POPUP_n (where n is 1 to 10)
+                            <br>
+                            MINIPANEL<br>
+                            <br>
+                            &nbsp;If your panel windows description does not fit any of above, use any number
+                            between 10000 and 19999. Lower and higher numbers are used internally.
+                            <br>
+                            There should be a MAIN_PANEL for every vehicle, otherwise other panels may not
+                            be rendered correctly.
+                        </td>
+                        <td style="width: 348px;">
+                            <b>ident=MAIN_PANEL</b>
+                            <br>
+                            <b>ident=THROTTLE_PANEL</b>
+                            <br>
+                            <b>ident=ANNUNCIATOR_PANEL</b>
+                            <br>
+                            <b>ident=OVERHEAD_PANEL</b>
+                            <br>
+                            <b>ident=MAIN_PANEL_ALT1</b>
+                            <br>
+                            <b>ident=MAIN_PANEL_ALT2</b>
+                            <br>
+                            <b>ident=MINIPANEL</b>
+                            <br>
+                            <b>ident=IDENT_MISC_POPUP_1</b>
+                            <br>
+                            <b>ident=270</b>
+                            <br>
+                            <b>ident=MISC_POPUP_1</b>
+                            <br>
+                            <b>ident=COLLECTIVE_PANEL</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>background_color</b>
+                        </td>
+                        <td style="width: 230px;">
+                            Use for a background created with no background bitmap. Use&nbsp;0,0,0 for a transparent
+                            background.
+                        </td>
+                        <td style="width: 348px;">
+                            <b>BACKGROUND_COLOR=16,16,16</b><br>
+                            <b>BACKGROUND_COLOR=0,0,0</b><br>
+                    </td></tr>
+					<tr>
+                        <td>
+                            <b>foreground_color</b>
+                        </td>
+                        <td style="width: 230px;">
+                            Use in conjunction with a transparent background color (background_color=0,0,0) to override the color of all non-transparent pixels.  Useful for HUD overlays because it can change the color of the entire	HUD without requiring updates to the XML.  It also eliminates the black pixels around the edges of text overlays that can results from blending text with
+							a black/transparent background.
+                        </td>
+                        <td style="width: 348px;">
+                            <b>FOREGROUND_COLOR=0,255,0</b><br>
+                            <b>FOREGROUND_COLOR=255,255,255</b><br>
+                    </td></tr>
+                    <tr>
+                        <td>
+                            <b>window_size</b>
+                        </td>
+                        <td style="width: 230px;">
+                            The percentage of the screen to be taken up by window, from 0 to 1.&nbsp; If this
+                            is set, the size of the main panel is ignored for this panel and size_mm becomes
+                            irrelevant for determining the size of the panel window. &nbsp;(size_mm is still
+                            used for calculating the relative sizes of the gauges within the window). This is
+                            required for Scaleform panels.
+                        </td>
+                        <td style="width: 348px;">
+                            <b>window_size=0.5</b><br>
+                            <b>window_size=0.5,0.3625</b><br>
+                            <b>window_size=1.000,1.000</b><br>
+                            <b>window_size=0.243,0.641</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>child_3d</b>
+                        </td>
+                        <td style="width: 230px;">
+                            This indicates that the window is part of the 3D scene, and cannot be undocked or
+                            dragged around the screen.
+                        </td>
+                        <td style="width: 348px;">
+                            <b>child_3d=1</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>DIRECTX_PANEL</b>
+                        </td>
+                        <td style="width: 230px;">
+                            Deprecated
+                        </td>
+                        <td style="width: 348px;">
+                            &nbsp;<b>Deprecated</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>windowsize_ratio</b>
+                        </td>
+                        <td style="width: 230px;">
+                            Determines the width of a panel window as a ratio of 
+							the client area of the main window. If not specified, 1.0 is the default.
+                        </td>
+                        <td style="width: 348px;">
+                            <b>windowsize_ratio=1.000</b><br>
+                            <b>windowsize_ratio=0.8</b><br>
+                            <b>windowsize_ratio=0.73</b>
+                            <br>
+                            <b>windowsize_ratio=0.3</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>sizeable</b>
+                        </td>
+                        <td style="width: 230px;">
+                            If this is set to 0 (the default is 1), then the user cannot resize this panel.&nbsp;
+                            This means that the window cannot be stretched in any way; its size is maintained
+                            once the panel window is loaded.&nbsp;If the main application window grows or shrinks,
+                            the size of the panel window stays the same; if the panels or entire vehicle are
+                            then reloaded after the main application window has been resized, the panel window
+                            then grows or shrinks to its appropriate size.
+                        </td>
+                        <td style="width: 348px;">
+                            sizeable=0
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>update_rate</b>
+                        </td>
+                        <td style="width: 230px;">
+                            The default update rate is 18hz. This parameter can be used to change this (to 6hz,
+                            or six times per second in the example). Note that this is the default rate for
+                            the whole panel, and this can be overridden by the update rate for individual gauges.
+                        </td>
+                        <td style="width: 348px;">
+                            <b>update_rate=6</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>window_pos</b>
+                        </td>
+                        <td style="width: 230px;">
+                            Overrides the position and windowsize_ratio variables. Provide at least an x value,
+                            the y value is optional.
+                        </td>
+                        <td style="width: 348px;">
+                            <b>window_pos=0.05, 0.25</b><br>
+                            <b>window_pos=0.0,0.0</b><br>
+                            <b>window_pos=0.0,0.15</b><br>
+                            <b>window_pos= 0.000, 0.000</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>draw_order00<br>
+                                to<br>
+                                draw_orderNN</b>
+                        </td>
+                        <td style="width: 230px;">
+                            Instructs the renderer to draw certain sets of gauges in a specific order. In any
+                            draw order list, the gauges are drawn in that order. For example:<br>
+                            <b>draw_order00=gauge50, gauge60</b><br>
+                            simply means gauge50 is drawn before gauge60.
+                        </td>
+                        <td style="width: 348px;">
+                            <b>draw_order00=gauge12, gauge09, gauge10, gauge11</b><br>
+                            <b>draw_order00=gauge50, gauge60</b><br>
+                            <b>draw_order00=gauge18, gauge15</b><br>
+                            <b>draw_order01=gauge51, gauge60</b>
+                            <br>
+                            <b>draw_order01=gauge17, gauge16</b>
+                            <br>
+                            <b>draw_order02=gauge52, gauge60</b>
+                            <br>
+                            <b>draw_order02=gauge17, gauge15</b>
+                            <br>
+                            <b>draw_order03=gauge53, gauge60</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>no_luminous</b>
+                        </td>
+                        <td style="width: 230px;">
+                            Set to 1 to ignore luminous flags for this panel. Default is 0.
+                        </td>
+                        <td style="width: 348px;">
+                            <b>no_luminous=1</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>zorder</b>
+                        </td>
+                        <td style="width: 230px;">
+                            Determines the order of appearance of the panels on the screen. Takes values from
+                            0 (bottom) to 100 (top).
+                        </td>
+                        <td style="width: 348px;">
+                            <b>zorder=0</b><br>
+                            <b>zorder=1</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>view_window_rect</b>
+                        </td>
+                        <td style="width: 230px;">
+                            Determines the size in units of the view outside the window. Reducing this size
+                            from the default of 8192 x 6144 affects the position of the horizon line, and reducing
+                            the view size can help performance.
+                        </td>
+                        <td style="width: 348px;">
+                            <b>view_window_rect=0,0,8192,3000</b><br>
+                            <b>view_window_rect=0,0,8192,4000</b>
+                            <br>
+                            <b>view_window_rect=0,0,8192,5900</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>file_1024_night</b>
+                        </td>
+                        <td style="width: 230px;">
+                            An optional bitmap file to use at night.
+                        </td>
+                        <td style="width: 348px;">
+                            <b>file_1024_night=panel_night.bmp</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>alpha_blend</b>
+                        </td>
+                        <td style="width: 230px;">
+                            The percentage (from 0.0 to 1.0) to blend the panel window with the background scene
+                            when the panel is docked. For example, for a 65% blending: alpha_blend=0.65.
+                        </td>
+                        <td style="width: 348px;">
+                            <b>alpha_blend=0.65</b>
+                        </td>
+                    </tr>
+					<tr>
+                        <td>
+                            <b>additive_blend</b>
+                        </td>
+                        <td style="width: 230px;">
+                            Optional setting to render panel with additive blend.  This may be useful for panels
+							which overlay the screen such as a HUD.  
+                        </td>
+                        <td style="width: 348px;">
+                            <b>additive_blend=1</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>window_size_ratio</b>
+                        </td>
+                        <td style="width: 230px;">
+                            Determines the width of a panel window as a ratio of the client area of the main
+                            window. If not specified, 1.0 is the default.
+                        </td>
+                        <td style="width: 348px;">
+                            <b>window_size_ratio=1.000</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="undefined" valign="undefined">
+                            <b>render_3d_window</b>
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            Specifies the type of window on which to render. A value of 1 specifies that the
+                            gauge will only render onto a 3-D&nbsp;view window, not a separate window. Note
+                            that you won't be able to undock this panel.
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            <b>render_3d_window=1</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="undefined" valign="undefined">
+                            <b>nomenu</b>
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            Specifies whether the menu will appear in the Views menu. A value of 1 specifies
+                            that the window will not appear in the menu. By default, a panel window appears
+                            in the menu.
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            <b>nomenu=1</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="undefined" valign="undefined">
+                            <b>texture</b>
+                        </td>
+                        <td style="width: 230px;" align="undefined" valign="undefined">
+                            Texture only applies to Virtual Cockpits.&nbsp;You must specify a name that starts
+                            with the dollar sign ($) and is no longer than 15 symbols. This must match the texture
+                            name used by the artist when creating the virtual cockpit model.
+                        </td>
+                        <td style="width: 348px;" align="undefined" valign="undefined">
+                            <b>texture=$MFD</b><br>
+                            <b>texture=$AircraftVC</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="undefined" valign="undefined">
+                            <a name="gaugeXX" /><b>gauge00<br>
+                                to<br>
+                                gaugeNN</b>
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            Specifies which gauge file to load and the X,Y position of the gauge. The Panel
+                            system starts loading gauges, starting from gauge00 until it reaches gauge99. After
+                            that, it loads gauge100, gauge101, and so on until it finds a break in the progression.
+                            This comma-delimited variable exists primarily to specify which gauge DLL file to
+                            load and the X, Y position of the gauge, in millimeters. This will override the
+                            size_mm setting. The basic format is:<br>
+                            gauge##=gaugefile!gaugename, X, Y, W, H, parameters.
+                            <br>
+                            <br>
+                            gauge# indicates the order in which the gauge is loaded<br>
+                            <br>
+                            gaugefile! indicates the specific .gau file in which the gauge is found (if the
+                            gauge is C based) or the cabinet file (if the gauge is XML based).<br>
+                            <br>
+                            gaugename displays the name of the gauge you assign in your gauge code via the GAUGE_NAME
+                            variable (C based), or the file name (XML based).<br>
+                            <br>
+                            X, Y indicates the X and Y position of the gauge, in millimeters, relative to the
+                            panel background. W indicates the width of the gauge in millimeters. H indicates
+                            the height of the gauge in millimeters. Parameters are passed to the gauge as a
+                            text string argument. However, if you have set size_mm to be 1024, these values
+                            are also the pixel values, which can be much easier to deal with.
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            <b>gauge00=Mooney_Bravo!Airspeed, 13, 10, 158, 158 </b>
+                            <br>
+                            <b>gauge01=Mooney_Bravo!Attitude, 9, 172, 166, 157 </b>
+                            <br>
+                            <b>gauge02=Mooney_Bravo!Altimeter, 13, 333, 158, 158</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="undefined" valign="undefined">
+                            <b>texture00<br>
+                                to<br>
+                                texture15</b>
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            Specifies which render to texture view to load and the X,Y position of the texture.
+                            This enables render to texture views that are defined in the cameras.cfg to be drawn
+                            inside of panels. Reference <a href="../../cameras/camera_configuration.html#Render To Texture">
+                                Render to Texture Options</a> in the Camera Configuration section of the SDK
+                            for more info on creating render to texture views. The Panel system starts loading
+                            textures, starting from texture00 until it reaches texture15. This comma-delimited
+                            variable exists primarily to specify which texture view to load and the X, Y position
+                            of the texture, in millimeters. This will override the size_mm setting.
+                            <br>
+                            The basic format is:<br>
+                            <br>
+                            texture##=texturename, X, Y, W, H
+                            <br>
+                            <br>
+                            texture## indicates the order in which the texture is drawn to the panel<br>
+                            <br>
+                            texturename must match the corresponding render to texture view defined in the cameras.cfg
+                            file.<br>
+                            <br>
+                            X, Y indicates the X and Y position of the texture, in millimeters, relative to
+                            the panel background. W indicates the width of the texture in millimeters. H indicates
+                            the height of the texture in millimeters.
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            <b>texture00=CockpitNVG, 0,514,765,500 </b>
+                            <br>
+                            <b>texture01=CockpitIR, 0,0,765,500 </b>
+                            <br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="undefined" valign="undefined">
+                            <b>textures_below_panel</b>
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            When using Texture elements in a panel of in XML gauges in a panel, those
+							textures are rendered separately from the panel texture itself because they
+							reside on the graphics card.  This options determines if the texture elements
+							above or below the rest of the panel.  By default texture elements render on top.
+							This is useful for creating sensor gauges with a 3d view and text or shape overlays.
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            <b>textures_below_panel=1</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="undefined" valign="undefined">
+                            <b>textures_use_additive_blend</b>
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            RTT texture elements are composited with the rest of the panel by rendering them on the graphics card
+							to avoid reading back RTT textures which reside on the graphics card.
+							This options allows the composition render to use
+							additive blend so that texture can be rendered on top of a gauge but allow the gauge elements to be 
+							seen trough it without using alpha.  Using textures below the panel and leaving clear space for them is 
+							with clear gauge elements is usually a better solution, but can be more complex to set up.
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            <b>textures_use_additive_blend=1</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="undefined" valign="undefined">
+                            <b>disable_alpha_write</b>
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            Specifies that a panel should not write alpha when rendering into a texture.
+							This only happens if VC MipMapping is enabled or if a panel contains a render-to-texture
+							element.  Alpha writes are enabled by default so that vc textures can have transparent portions.
+							When rendering standard gauge elements on top of a render to texture view for example alpha writes
+							on the standard gauge texture would end up masking out the parts of the RTT view that were intended to \
+							be seen.  This could be fixed in model by not supporting alpha in the material but the option is included
+							here to allow such a fix without modifying the model source.
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            <b>disable_alpha_write=1</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="undefined" valign="undefined">
+                            <b>pixel_size</b>
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            Sets size of window in pixels.  If not set, and sizeable is false, window pixel size will 
+							be set to background image size.  If size y is set to 0, it will be generated from the aspect 
+							ratio of background file.  If no background file is used y will be set equal to x.
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            <b>pixel_size=800,600</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="undefined" valign="undefined">
+                            <b>texture_size</b>
+                        </td>
+                        <td align="undefined" valign="undefined">
+						The panel window backing texture is resized by default to match the window's on-screen pixel size 
+						(rounded up to the nearest power of 2 for hardware compatibility).  Setting this value 
+						will override the texture to a fixed size (still rounded up to a power of two in each dimension).  
+						Windows will still be sizeable but the texture will be scaled on the graphics card.
+						This can help with performance and memory use in some cases. For example stretching 
+						a panel full screen on at 1920x1080 would round up to 2048x2048.  It would be a better use of
+						resources to build the panel content to a height of 1024 and override the texture size in that case. 
+						
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            <b>texture_size=1024,512</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="undefined" valign="undefined">
+                            <b>locked</b>
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            If set to 1, the user will not be able to size or move the window.  
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            <b>locked=1</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="undefined" valign="undefined">
+                            <b>ignore_input</b>
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            If set to 1, the panel window will ignore all input.  This is useful for docked panel overlays where mouse clicks should not be processed and pass through to the main window.
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            <b>ignore_input=1</b>
+                        </td>
+                    </tr>
+					<tr>
+                        <td align="undefined" valign="undefined">
+                            <b>SCALEFORM_FILE</b>
+                        </td>
+                        <td align="undefined" valign="undefined">
+							Specifies the published Adobe Flash File (*.swf) for Scaleform to load into this panel. This would be used in lieu of the <b>gauge00 to gaugeNN</b> property.
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            <b>SCALEFORM_FILE=CustomHUD.swf</b>
+                        </td>
+                    </tr>
+					<tr>
+                        <td align="undefined" valign="undefined">
+                            <b>SCALEFORM_INSTANCE_NAME</b>
+                        </td>
+                        <td align="undefined" valign="undefined">
+							Provide a specific identifier string which can be queried for in the Scaleform Prepar3D Interface. This can allow a developer to reuse a <b>SCALEFORM_FILE</b> but use the <b>SCALEFORM_INSTANCE_NAME</b> to perform different logic for each instance of the <b>SCALEFORM_FILE</b>.						
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            <b>SCALEFORM_INSTANCE_NAME=LeftView</b>
+                        </td>
+                    </tr>
+					<tr>
+                        <td align="undefined" valign="undefined">
+                            <b>SCALEFORM_RTT_ELEMENT_00 to SCALEFORM_RTT_ELEMENT_NN</b>
+                        </td>
+                        <td align="undefined" valign="undefined">
+							RTT Views can be used inside of Scaleform content. This property specifies the name of the RTT Camera View that the developer wishes to include in the associated <b>SCALEFORM_FILE</b>. See <a href="../../cameras/camera_configuration.html#Render To Texture">Render To Texture Options</a> for information on configuring RTT Views and <a href="../scaleform/scaleform_overview.html#ImportingRTTCameraViews">Importing RTT Camera Views Into Scaleform</a> for more information about using RTT Views in Scaleform. 
+                        </td>
+                        <td align="undefined" valign="undefined">
+                            <b>SCALEFORM_RTT_ELEMENT_00=Radar</b> (given there is a RTT Camera View named 'Radar') 
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="undefined" valign="undefined">
+                            <b>3dp_worldspace_pos_offset</b>
+                        </td>
+                        <td style="width: 230px;" align="undefined" valign="undefined">
+                            Amount of XYZ offset applied to the 3D Panel from its origin point. (Camera Transform reference)
+                        </td>
+                        <td style="width: 348px;" align="undefined" valign="undefined">
+                            <br>
+                            <b>3dp_worldspace_pos_offset=0,0,1</b><br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="undefined" valign="undefined">
+                            <b>3dp_pbh_offset</b>
+                        </td>
+                        <td style="width: 230px;" align="undefined" valign="undefined">
+                            Amount of rotation applied to the 3D Panel. (Pitch, Bank, Heading)
+                        </td>
+                        <td style="width: 348px;" align="undefined" valign="undefined">
+                            <br>
+                            <b>3dp_pbh_offset=0,0,0</b><br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="undefined" valign="undefined">
+                            <b>3dp_size</b>
+                        </td>
+                        <td style="width: 230px;" align="undefined" valign="undefined">
+                            Size of the 3D Panel.
+                        </td>
+                        <td style="width: 348px;" align="undefined" valign="undefined">
+                            <br>
+                            <b>3dp_size=1,1</b><br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="undefined" valign="undefined">
+                            <b>3dp_camera_transform_reference</b>
+                        </td>
+                        <td style="width: 230px;" align="undefined" valign="undefined">
+                            Specifies the position in which the 3D Panel uses to offset. Valid Entries: ORIGIN, CAMERA, EYE.
+                        </td>
+                        <td style="width: 348px;" align="undefined" valign="undefined">
+                            <br>
+                            <b>3dp_camera_transform_reference=camera</b><br>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <br>
+            <hr>
+            <h3><a name="default view"></a>[default view]</h3>
+            <p>This section sets the overall default view for the default 3-D window.</p>
+            <table class="ListTable">
+                <thead>
+                    <th>Property</th>
+                    <th>Description </th>
+                    <th>Examples</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <b>x</b>
+                        </td>
+                        <td>
+                            Specifies the X position of the default 3D window.
+                        </td>
+                        <td>
+                            <b>X=0</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>y</b>
+                        </td>
+                        <td>
+                            Specifies the Y position of the default 3D window.
+                        </td>
+                        <td>
+                            <b>Y=0</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>size_x</b>
+                        </td>
+                        <td>
+                            Specifies the width of the default 3D window.
+                        </td>
+                        <td>
+                            <b>SIZE_X=8192</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>size_y</b>
+                        </td>
+                        <td>
+                            Specifies the height of the default 3D window.
+                        </td>
+                        <td>
+                            <b>SIZE_Y=2500</b>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <br>
+            <hr>
+            <h3><a name="color"></a>[color]</h3>
+            <p>This section allows the default color lighting settings to be changed.</p>
+            <table class="ListTable">
+                <thead>
+                    <th>Property</th>
+                    <th>Description </th>
+                    <th>Examples</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <b>day</b>
+                        </td>
+                        <td>
+                            The lighting color applied during daytime (RGB).
+                        </td>
+                        <td>
+                            &nbsp;<b>Day=255,255,255</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>night</b>
+                        </td>
+                        <td>
+                            The lighting color applied at night (RGB).
+                        </td>
+                        <td>
+                            <b>Night=205,101,100</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>luminous</b>
+                        </td>
+                        <td>
+                            The lighting color applied to gauges that are luminous (RGB).
+                        </td>
+                        <td>
+                            <b>Luminous=147,64,64</b>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>The day and night colors effectively determine the maximum and minimum brightness
+                of the panel. Luminous specifies the color that can be applied to the luminous sections
+                of the gauges. Here is an example to demonstrate what these colors mean. In this
+                example, the colors for day, night, and luminous are red, green, and blue, respectively.
+                Note the subtle difference between dusk and night &ndash; in this the environmental
+                lighting system the height of the sun in the sky, moonlight, and so on, determines
+                what percentage of the day color to use. When the lights are off no specified color
+                is applied to the panel and its gauges however the brightness of the images are
+                still affected by the environmental lighting.</p>
+            <p>
+                <img src="images/luminous_gauges.jpg" width="570" height="432"></p>
+            <hr>
+            <h3><a name="views"></a>[views]</h3>
+            <p>This section enables the default views to be changed.</p>
+            <table class="ListTable">
+                <thead>
+                    <th>Property</th>
+                    <th>Description </th>
+                    <th>Examples</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <b>view_forward_windows</b>
+                        </td>
+                        <td>
+                            Identifies which panel windows display in the forward section of the vehicle. These
+                            values must match the specific ident= value in the corresponding [windowXX] section.&nbsp;Valid
+                            entries are:<br>
+                            <br>
+                            MAIN_PANEL<br>
+                            RADIO_STACK_PANEL<br>
+                            COMPASS_PANEL<br>
+                            ANNUNCIATOR_PANEL<br>
+                            ANNUNCIATOR2_PANEL<br>
+                            COLLECTIVE_PANEL<br>
+                            THROTTLE_PANEL<br>
+                            MINI_CONTROLS_PANEL<br>
+                            IFR_MAIN_PANEL<br>
+                            GPS_PANEL<br>
+                            OVERHEAD_PANEL
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>view_forward_dir</b>
+                        </td>
+                        <td>
+                            Enables you to change the default value of the view direction. Enter values for
+                            Pitch, Bank, and Heading.
+                        </td>
+                        <td>
+                            &nbsp;<b>VIEW_FORWARD_DIR=-1.0, 0.0, 0.0</b><br>
+                            <b>VIEW_FORWARD_DIR= 8.0, 0.0, 0.0</b>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <br>
+            <hr>
+            <h3>[fltsim]<a name="fltsim"></a></h3>
+            <table class="ListTable">
+                <thead>
+                    <th>Property</th>
+                    <th>Description </th>
+                    <th>Examples</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <b>alias</b>
+                        </td>
+                        <td>
+                            The relative path from the <i>Prepar3D</i> root directory to the panel directory
+                            of the vehicle from which the panel should be an exact copy.
+                        </td>
+                        <td>
+                            Maule M7 260C Skis<br>
+                            <b>[fltsim]<br>
+                                alias=\Maule_M7_260C\panel</b><br>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="TopLink">
+                <a href="#top" class="TopLink">- top -</a></div>
+        </div>
+        <hr>
+        <div id="footer">
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <title>Panel and Gauge Artwork</title>
+    <link rel="StyleSheet" href="../../../common/p3d_style.css" type="text/css">
+</head>
+<body>
+    <div id="header-sdk">
+        <div id="header-fill">
+        </div>
+    </div>
+    <div id="content">
+        <a name="top"></a>
+        <div class="article-bodycopy">
+            <h1><a name="Tips on Creating Art for Panels and Gauges"></a>Panel and Gauge Artwork</h1>
+            <hr>
+            <table border="0" cellspacing="10" cellpadding="0" align="right" summary="SummaryTBD">
+                <tr>
+                    <td>
+                        <span class="TOCsubhead">Contents</span>
+                        <table border="0" cellspacing="5" cellpadding="0" class="RelatedLinkTableThin" summary="SummaryTBD">
+                            <tr class="article-bodycopy">
+                                <td>
+                                    <ul>
+                                        <li><a href="#Background">Background</a></li>
+                                        <li><a href="#Creating a Layout for the Panel">Creating a Layout for the Panel</a></li>
+                                        <li><a href="#Beginning Production">Beginning Production</a></li>
+                                        <li><a href="#Building the Gauges">Building the Gauges</a></li>
+                                        <li><a href="#Using the Psd2Xml tool">Using the Psd2Xml Tool </a></li>
+                                        <li><a href="#Using Imagetool with Gauges">Using Imagetool with Gauges </a></li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!---Related Links--->
+                <tr>
+                    <td>
+                        <span class="TOCsubhead">Related Links</span>
+                        <table border="0" cellspacing="5" cellpadding="0" class="RelatedLinkTableThin" summary="SummaryTBD">
+                            <tr class="article-bodycopy">
+                                <td>
+                                    <ul>
+                                        <li><a href="../../sdk_overview.html">SDK Overview</a></li>
+                                        <li><a href="panel_configuration_files.html">Panel Configuration Files</a></li>
+                                        <li><a href="../gauges/gauges_overview.html">Programmable Gauges</a></li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!---Table of Contents--->
+            </table>
+            <p>This document provides some general guidelines you might find useful as you create
+                artwork for your panels and gauges. It assumes you have some general familiarity
+                with graphic design and associated tools. </p>
+            <hr>
+            <h2>Background <a name="Background" id="Background"></a></h2>
+            <p>In <i>Prepar3D</i> 2-D art is used to represent the aircraft panels in non-Virtual
+                Cockpit mode. The panel is broken down into many files stacked on top of one another.
+                The cockpit background is a separate bitmap that has the individual gauges placed
+                over it. Currently, the shadows of the gauges are placed on the panel background.
+                The gauges themselves are not realistically three-dimensional and do not represent
+                accurate depth relationships. This limitation is deliberate because it gives you
+                the ability to position the gauges on the panel wherever you prefer. </p>
+            <p>The most important feature of a Panel system is its readability. The panel should
+                not only be convincing, but it must look acceptable at any resolution. You should
+                create a set of art at 1024 x 768 resolution. Lower resolutions are not supported.
+            </p>
+            <h3>Learning about the Aircraft <a name="Learning about the Aircraft" id="LearningabouttheAircraft">
+            </a></h3>
+            <p>Before beginning work on a panel, you should have a good understanding of what you
+                will be working on. Familiarize yourself with the aircraft and its capabilities.
+                Gather as much information as possible on the panel. Once you have gone through
+                the reference material for the aircraft, compare the panel with those of other aircraft.
+                You will always have to create the background of the specific cockpit, but sometimes
+                you can use gauges from a different panel. These gauges may resemble the gauges
+                for your aircraft even though they are not an exact replica. Originality is always
+                important, but sometimes choosing a generic gauge background and the re-use of gauges
+                can save a lot of time, especially in building prototypes. </p>
+            <hr>
+            <h2>Creating a Layout for the Panel <a name="Creating a Layout for the Panel" id="CreatingaLayoutforthePanel"></a>
+            </h2>
+            <h3>Researching the Instruments <a name="Researching the Instruments" id="ResearchingtheInstruments">
+            </a></h3>
+            <p>Now start thinking about the look and feel of the cockpit. Find out which instruments
+                you should include in the layout. Create a priority list of instruments and go through
+                it with anyone with knowledge about what's important to include in the cockpit.
+                Talk with pilots and get an idea of what people want to see. Unless you know a fair
+                amount about aviation, you may overlook something that is critical for efficient
+                flight or navigation. </p>
+            <h3>Creating the Layout <a name="Creating the Layout" id="CreatingtheLayout"></a>
+            </h3>
+            <p>Once you have a list of what needs to be included on the panel, create a layout of
+                what the panel is going to look like. The layout can be the most difficult part
+                of creating a panel. However, the goal of the layout is very simple: you want the
+                panel to retain its original look and feel while allowing the most space for instruments.
+                Even a few pixels can make a difference when making room for instruments. Make sure
+                that all the instruments stay in proportion to each other and with the panel background.
+                Remember, this is only a layout and it can look a little rough. Some artists like
+                to create layouts by drawing them, while others find that cutting and pasting the
+                raw photographs, using photo editing software, is easier. </p>
+            <p>One concern you may have when you create a layout will be the height of the panel.
+                A panel that is too high will decrease visibility for the user. Creating a panel
+                taller than 50 percent of the screen can be acceptable if it is a better representation
+                of the real-world layout, though 50 percent of the screen height is a good limit
+                to try to keep the height of the panel under. </p>
+            <p>The slope of the panel's sides is another thing to consider. If the sides are pitched
+                too steep, performance will be lost due to the larger 3-D window. Raising the 3-D
+                window a few pixels can increase performance. If the sides are not pitched very
+                much, the panel will appear flat, without dimension. </p>
+            <hr>
+            <h2>Beginning Production <a name="Beginning Production" id="BeginningProduction"></a>
+            </h2>
+            <h3>Creating the Base Background <a name="Creating the Base Background" id="CreatingtheBaseBackground">
+            </a></h3>
+            <p>You may want to begin with the panel background. This piece of art can take a long
+                time to create, especially when it is your first or second panel. Make sure that
+                you spend the time needed in making the background seamless. Use layers to your
+                advantage in creating depth. If the photograph that you work with is too difficult
+                to clean up, use flat colors to make the background's base. Then add a gradation,
+                usually lighter on top to darker on the bottom, and some sort of noise or texture
+                to give more depth. You can often achieve similar results by cleaning a photograph
+                of a background with filters and gradation. </p>
+            <p>Once the base has been established, add subtle depth and detail. Scratches, nicks
+                and paint chips can add a lot of character and realism to a panel. Over time, you
+                may want to create a library of such details. Apply them through the aid of opacity
+                and layer options. Each case is different. Experiment with what looks best.
+            </p>
+            <h3>Merging the Side Panels <a name="Merging the Side Panels" id="MergingtheSidePanels">
+            </a></h3>
+            <p>After you have established the base background, begin working on how the side panels
+                will merge into the background. Often, you can place a seam or crack over the two
+                layers, which helps blend the two together. You can take these cracks or seams from
+                any cockpit photograph; otherwise, you may have better luck drawing a seam, although
+                you may find that drawn cracks often appear a bit too perfect. </p>
+            <h3>Creating the Panel Edge and Shadow <a name="Creating the Panel Edge and Shadow" id="CreatingthePanelEdgeandShadow"></a></h3>
+            <p>Over the base background and sides will be the edge of the panel and its shadow.
+                Make the edge of the panel as thin as possible without sacrificing the cockpit's
+                character. A thin edge can look wimpy, while a thick edge, as real as it may be,
+                will be a waste of space. You may want to keep these two elements as separate layers
+                for flexibility in making changes later. </p>
+            <p>Shadows are usually between 50 percent and 60 percent opacity, which gives the panel
+                depth but does not create shadows that are too overpowering. The default lighting
+                typically represents an overhead softer light source (for example, a hazy day at
+                noon). If you choose a direction of light, note that it may not match the outside
+                of the plane or landscape. </p>
+            <h3>Compressing the File <a name="Compressing the File" id="CompressingtheFile"></a>
+            </h3>
+            <p>When the panel background is close to complete, make a copy and compress it into
+                an 8-bit file. If banding occurs in the shadowed areas, you may have to lighten
+                or darken the shadow to make it look smooth. This, of course, will vary depending
+                on which program you use to compress your files into 8-bit. </p>
+            <hr>
+            <h2>Building the Gauges <a name="Building the Gauges" id="BuildingtheGauges"></a>
+            </h2>
+            <h3>Separating the Gauge Elements <a name="Separating the Gauge Elements" id="SeparatingtheGaugeElements">
+            </a></h3>
+            <p>When creating instrument gauges, try keeping as many elements separate as possible.
+                This will enable you to easily add library elements to your instruments without
+                having to do a lot of work. </p>
+            <h3>Working at a Larger Size <a name="Working at a Larger Size" id="WorkingataLargerSize">
+            </a></h3>
+            <p>You'll probably find it useful to work in a larger size than that which the gauge
+                will be resized to. If appropriate, start with the original scanned photograph and
+                work from a copy. This will be helpful as you clean up the instrument and still
+                need a reference. </p>
+            <h3>Cleaning the Rings and Backgrounds <a name="Cleaning the Rings and Background" id="CleaningtheRingsandBackground"></a></h3>
+            <p>The first thing to do is clean up the ring and background of the instrument. Make
+                sure the lighting remains even across the ring (with no hot spots from the lighting).
+                Hot spots give a false impression of where the sun is coming from. </p>
+            <p>Keep as much detail as possible, which gives the gauge character. Create a copy of
+                the inside of the gauge (the gauge face) where the glass covers it, and make this
+                a separate layer. Remove the inside of the gauge from the original layer to clean
+                up the edge of the ring. Now you can lighten or darken the gauge background without
+                changing the tone of the inside. </p>
+            <h3>Adding Depth and Details <a name="Adding Depth and Details" id="AddingDepthandDetails">
+            </a></h3>
+            <p>Working on the inside the gauge face, remove the needle and make it into a separate
+                layer. Next, clean up the existing art, or lay down a color, then add a texture
+                or noise on top to add depth. You may want to apply a different "clouds" filter
+                to the gauge face to make it look a little more natural. With the ring layer over
+                the face layer, create a little drop shadow from the ring to add depth to the gauge.
+                Make sure this is on a separate layer for flexibility. You may want to add a light-black
+                Gaussian-blurred ring over the gauge face to show that it has a round feel to it.
+                These are subtle features that add reality to the artwork. </p>
+            <p>Now create another layer. With the original raw photograph as a guide, draw the tick
+                marks of the instrument. Try to make these tick marks bright and readable so they
+                stand out when you resize the gauge later. Finally, return to the needle layer and
+                strip the needle from the background. Make sure that the tonality of the needle
+                does not blend into the new gauge face. </p>
+            <h3>Compiling the Gauge <a name="Compiling the Gauge" id="CompilingtheGauge"></a>
+            </h3>
+            <p>To compile your gauge, create another layer and merge all of the gauge elements,
+                except for the needle, into that layer, while retaining the existing elements. Once
+                you have done this, you have a compiled gauge and all of its elements and its separate
+                needle are ready for resizing. </p>
+            <h3>Resizing the Gauge <a name="Resizing the Gauge" id="ResizingtheGauge"></a></h3>
+            <p>Make sure that you save your work before you begin resizing. If you need to make
+                any adjustments to the gauge, you can change the element and then re-merge that
+                element onto the compiled layer without having to repeat a lot of work.</p>
+            <ol>
+                <li>Make a copy of the compiled instrument layer and place this into a separate file.
+                </li>
+                <li>Copy the needle into the new file to resize both at once.</li>
+                <li>Resize the file to 1024x768 resolution.</li>
+                <li>Now, add the type to the gauge (referring to the larger original file for reference).
+                    Explore the fonts on your computer and choose one that matches the typeface of the
+                    gauge.</li>
+                <li>Create another layer and merge the compiled gauge with the type layer. Sharpen this
+                    layer and the needle layer. Save this file for any future adjustments.</li>
+                <li>Next, make the two layers into separate files. When making these separate files,
+                    clean up the edges of the file by giving it an aliased edge. It will save time later
+                    when you compress the 24-bit file to 8-bit.</li>
+                <li>Make the backgrounds of the files true black (0,0,0 RGB value). True black appears
+                    transparent in the simulation.</li>
+                <li>Place these files into a separate folder, which represents the 1024 art ready for
+                    8-bit conversion.</li>
+            </ol>
+            <h3>Palletizing the Artwork <a name="Palletizing the Artwork" id="PalletizingtheArtwork">
+            </a></h3>
+            <p>You can use a number of programs to palletize your artwork, it is educational to
+                try several before deciding. Different pieces of the artwork do not need to use
+                the same palette. Once you've converted the files to 8-bit, save them as a separate
+                file and place them in a folder labeled "Completed Art" (or something that lets
+                you know the art is ready for final use). </p>
+            <p>Check to see if pixels with the values of 0,0,0 and 1,1,1 are where they should be.
+            </p>
+            <h3>Creating a Final Composition <a name="Creating the Final Composition" id="CreatingtheFinalComposition">
+            </a></h3>
+            <p>Once all the artwork is complete and has been resized to both resolutions, assemble
+                the artwork into a final composition for the entire panel. </p>
+            <p>Double-check to see if there are any mistakes or if something doesn't look right.
+                It is inevitable that you will have to change something. Make the appropriate adjustments
+                and then add the new artwork to the final composition. </p>
+            <hr>
+            <h2>Using the Psd2Xml Tool <a name="Using the Psd2Xml tool" id="UsingthePsd2Xmltool">
+            </a></h2>
+            <p>Psd2Xml is a tool that generates the files required for a gauge from a multilayered
+                Adobe Photoshop image (.PSD file).&nbsp; The files output are a set of .BMP files
+                (one for each layer in the .PSD) and a skeleton XML file. This tool is located in
+                the following folder:
+			</p>
+			<div class="codesample">
+			SDK/Panels Gauges User Interface/Panels
+			</div>
+            <p>To run the tool from the graphical user interface (GUI), start it and select the
+                PSD file you want to convert. </p>
+            <p>To run the tool from the command-line, use the following syntax: </p>
+            <p><b>psd2xml [/o=&lt;dir&gt;] &lt;input.psd&gt;</b> </p>
+            <p>The optional <b>/o</b> flag specifies what directory the generated files should be
+                output to, otherwise they are output to the same folder as the input file. </p>
+            <p>Notes on using the Psd2Xml tool: </p>
+            <ul>
+                <li>The tool ignores layers that are not currently set to &quot;visible&quot; in Photoshop.
+                </li>
+                <li>The name of a layer becomes the name of the .BMP file. For each .BMP file, an &lt;Element&gt;
+                    with an &lt;Image&gt; by that name will be generated in the XML file.</li>
+                <li>If there is a channel in the PSD file with the same name as the name of a layer,
+                    the pixels of the channel are interpreted as follows:</li>
+                <ul>
+                    <li>a pixel with the value 255 (white) means the corresponding pixel in the BMP file
+                        will be an image pixel; </li>
+                    <li>a pixel with the value 128 (gray) means the corresponding pixel in the BMP file
+                        will be a mask pixel (1, 1, 1); </li>
+                    <li>a pixel with the value of 0 (black) means the corresponding pixel will be transparent
+                        pixel (0, 0, 0).&nbsp; </li>
+                    <li>use this method to generate mask bitmaps for use within the panel system.</li>
+                </ul>
+                <li>For elements which rotate (needles and knobs for example), you can specify the axis
+                    in Photoshop. Place an anchor point with pen tool at the rotation point of the element
+                    and give the path the same name as the layer. &nbsp; This will automatically generate
+                    the &lt;Axis&gt; property definition.</li>
+                <li>For elements which rotate, you can also specify the tip point. Use the pen tool
+                    to put a second anchor point at the tip.&nbsp; This will define the default orientation
+                    of the rotating element.</li>
+                <li>If a layer has the same name as another layer, with &quot;_window&quot; or &quot;_mask&quot;
+                    appended to the end, in the generated XML, the mask layer will be a &lt;MaskImage&gt;
+                    and paired with the matching &lt;Image&gt;. </li>
+            </ul>
+            <h3>Psd2Xml Sample</h3>
+            <p>If the tool psd2xml is run with the sample .psd&nbsp;file provided ( from the command
+                line type <b>psd2xml Psd2XmlSample.psd</b>) the output is Psd2XmlSample.xml plus
+                some bitmaps. &nbsp;If you then open Psd2XmlSample.xml in the ACE gauge editor,
+                it will display the gauge elements and just require a bit of editing in order for
+                the gauge to function in the simulator: </p>
+            <p>
+                <img src="images/psd_to_xml_sample.jpg" width="811" height="456"></p>
+            <hr>
+            <h2>Using Imagetool with Gauges <a name="Using Imagetool with Gauges" id="UsingImagetoolwithGauges">
+            </a></h2>
+            <p>Imagetool includes many methods for manipulating images used in <i>Prepar3D</i>.
+                However, most of those features are used for other areas of the simulation besides
+                gauges (terrain, etc.). Gauge developers can, however, create images of the correct
+                format for gauges by using Imagetool. &nbsp; The major uses of Imagetool for gauge
+                developers are as follows: </p>
+            <ul type="disc">
+                <li>Convert .psd's to the proprietary .bmp-with-alpha format</li>
+                <li>Convert a .psd to a .bmp with mask pixels, based on the image 's alpha channel.</li>
+                <li>View images created with ImageTool.</li>
+            </ul>
+            <p>Imagetool is also an easy way to determine the format of an image.</p>
+            <h3>Converting .psd's to .bmp-with-alpha format, maintaining alpha channel </h3>
+            <p>There are two ways to do this: by running the tool from the graphical user interface
+                (GUI) or the command-line. </p>
+            <h4>GUI</h4>
+            <ol start="1" type="1">
+                <li>Open the file by using the File-&gt;Open menu command.</li>
+                <li>In the Image-&gt;Format menu, choose the format you wish to convert to (8-Bit).</li>
+                <li>Save the file by using the File-&gt;Save menu command.</li>
+            </ol>
+            <h4>Command-line</h4>
+            <ol start="1" type="1">
+                <li>Open a command window by running "cmd.exe" from the Start-&gt;Run dialog.&nbsp;
+                </li>
+                <li>From the command line, run "imagetool &ndash;gaugealpha [filename]" where [filename]
+                    is the name of the file you wish to convert. (Note: This flag is not documented
+                    in the Usage guidelines that appear when "Imagetool -?" is run.)&nbsp; By default
+                    the .bmp file generated will have the same name as the .psd from which it was created.
+                    The image generated will be 8-bit (palletized). </li>
+            </ol>
+            <p>After converting the image to .bmp-with-alpha format by using one of the two methods
+                above, you can view the alpha channel in imagetool.</p>
+            <h3>Converting .psd's to .bmp-with-alpha format, creating a " gauge image" </h3>
+            <p>When a "gauge image" is created, the alpha channel's pixels are altered as follows:
+            </p>
+            <ul type="disc">
+                <li>If a gray pixel has a value greater than or equal to 148, it is converted to white,
+                    which indicates an opaque pixel.&nbsp; </li>
+                <li>If it is between 108 and 147, it is converted to gray, which indicates a mask pixel.
+                </li>
+                <li>Pixels with values less than 108 are converted to black, which indicates a transparent
+                    pixel. Additionally, the RGB channel is modified so that transparent pixels are
+                    black and mask pixels are of RGB value 1,1,1.</li>
+            </ul>
+            <p>There are two ways to create a "gauge" image: by running the tool from the graphical
+                user interface (GUI) or from the command-line. </p>
+            <h4>GUI</h4>
+            <ol start="1" type="1">
+                <li>Open the file by using the File-&gt;Open menu command.</li>
+                <li>Select the Image-&gt;Make Gauge menu item.</li>
+                <li>Save the file by using the File-&gt;Save menu command.</li>
+            </ol>
+            <h4>Command-line</h4>
+            <ol start="1" type="1">
+                <li>Open a command window by running "cmd.exe" from the Start-&gt;Run dialog.&nbsp;
+                </li>
+                <li>From the command line, run "imagetool &ndash;gauge [filename] " where [filename]
+                    is the name of the file you wish to convert.&nbsp; By default the .bmp file that
+                    is generated will have the same name as the .psd from which it was created. The
+                    image generated will be 8-bit palletized).</li>
+            </ol>
+            <p>After converting the image to .bmp-with-alpha format by using one of the two methods
+                above, you can view newly created image and its alpha channel in imagetool.
+            </p>
+            <br>
+            <h3>Viewing images created with ImageTool</h3>
+            <p>Because of the unique file format (.bmp-with-alpha), ImageTool is the best way to
+                view these images. The default view in ImageTool displays a combination of the alpha
+                channel and the RGB channels. The way this alpha channel is applied depends on the
+                way the image was created: </p>
+            <ul type="disc">
+                <li>If the alpha channel was maintained during the file conversion, the alpha channel
+                    is applied in the following manner:&nbsp; the brighter the pixel in the alpha channel,
+                    the brighter the RGB pixel is drawn.&nbsp;</li>
+                <li>On the other hand, if a "gauge image" is viewed, the alpha channel is not applied
+                    in the default view &ndash; only the RGB channel is visible.</li>
+            </ul>
+            <p>
+                <img src="images/image_tool_alpha.jpg" width="381" height="285"></p>
+            <p>To view the alpha channel separately, choose the menu option View -&gt; Alpha Channel.
+            </p>
+            <h4>Determining the format of an image</h4>
+            <p>To determine the format of an image, click on Image-&gt;Format in Image Tool.</p>
+            <div class="TopLink">
+                <a href="#top" class="TopLink">- top -</a></div>
+        </div>
+        <hr>
+        <div id="footer">
+        </div>
+    </div>
+</body>
+</html>
