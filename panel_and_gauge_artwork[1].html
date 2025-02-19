@@ -1,8 +1,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-    <title>C++ Gauges Overview</title>
-    <link rel="StyleSheet" href="../../../../common/p3d_style.css" type="text/css">
+    <title>Cabin Comfort Gauge Sample</title>
+    <link rel="StyleSheet" href="../../../../../../common/p3d_style.css" type="text/css">
 </head>
 <body>
     <div id="header-sdk">
@@ -12,26 +12,25 @@
     <div id="content">
         <a name="top"></a>
         <div class="article-bodycopy">
-            <h1><a name="Programming C++ Gauges"></a>C++ Gauges</h1>
+            <h1><a name="Overview"></a>Cabin Comfort Gauge Sample</h1>
             <hr>
             <table border="0" cellspacing="10" cellpadding="0" align="right" summary="SummaryTBD">
                 <!---Table of Contents--->
-                
-                <!---Related Links--->
                 <tr>
                     <td>
-                        <span class="TOCsubhead">Related Links</span>
+                         <span class="TOCsubhead">Contents</span>
                         <table border="0" cellspacing="5" cellpadding="0" class="RelatedLinkTableThin" summary="SummaryTBD">
                             <tr class="article-bodycopy">
                                 <td>
                                     <ul>
-                                        <li><a href="../../../sdk_overview.html">SDK Overview</a></li>
-                                        <li><a href="../xml_gauges/xml_gauges_overview.html">Creating XML Gauges </a></li>
-                                        <li><a href="../references/help_ids.html">HelpIDs</a></li>
-                                        <li><a href="../../panels/panel_configuration_files.html">Panel Configuration Files</a></li>
-                                        <li><a href="../references/tooltips.html">Tooltips</a></li>
-                                        <li><a href="../references/token_variables.html">Token Variables </a>
-                                        </li>
+                                        <li><a href="#Step 1: Create the XML component of the gauge">Step 1: Create the XML component of the gauge</a></li>
+                                        <li><a href="#Step 2: Creating a property table for the gauge variables">Step 2: Creating a property table for the gauge variables</a></li>
+                                        <li><a href="#Step 3: Initialize the variables and  the property table">Step 3: Initialize the variables and  the property table</a></li>
+                                        <li><a href="#Step 4: Getting and Setting variables">Step 4: Getting and Setting variables</a></li>
+                                        <li><a href="#Step 5: Updating Variables">Step 5: Updating Variables</a></li>
+                                        <li><a href="#Step 6: Handle the modules initialization and termination">Step 6: Handle the modules initialization and termination</a></li>
+                                        <li><a href="#Step 7: Export the initialization, termination and Panels pointer correctly">Step 7: Export the initialization, termination and Panels pointer correctly</a></li>
+										<li><a href="#Step 8: Compile, Run and Test the DLL gauge">Step 8: Compile, Run and Test the DLL gauge</a></li>
                                     </ul>
                                 </td>
                             </tr>
@@ -39,36 +38,411 @@
                     </td>
                 </tr>
             </table>
-			
-            <h2>Overview</h2>
-            <p>One of the methods of gauge creation is with C++. This system of programming gauges is ideal for users who want flexibility in creating their gauges but are not familiar with the graphical toolkits 
-			supported by Prepar3D. A gauge can be created with C++ alone, or with XML working in tandem. These are called Mixed Mode gauges. This method can be useful to implement XML driven visuals backed by C++ programatic functionality.
-			Graphics for mixed mode and XML gauges can be created with the assistance of the ACE tool, described in the <a href="../xml_gauges/xml_gauges_overview.html">Creating XML Gauges</a> document.</p>
+            <br><h2>Overview</h2>
+            <p>The Cabin Comfort sample below demonstrates
+                how to link a simple XML definition of a gauge with underlying C++ code. The advantage
+                of this approach is that you can use XML to build most of the gauge (described in
+                the <a href="../../../xml_gauges/xml_gauges_overview.html">Creating XML Gauges</a> document) and yet
+                access the power and flexibility of a programming language.</p>
+				
+			<br><p>Using the IPanelCCallback, IAircraftCCallback, IGaugeCCallback, and ISerializableGaugeCCallback,
+                a C++ dll can be used to register a property provider with Prepar3D which provides
+                access to the DLL from XML via C: variables. The NetInPublic
+                and NetOutPublic interfaces are also exposed which allow the ISerializableGaugeCCallback
+                to be used to create a property provider which can be serialized and deserialized
+                for use with multi-player shared cockpit mode, or with scenario file loading and saving
+                (if enabled in the Prepar3D settings). </p>
+				
+            <br><p>For a more advanced example of a mixed mode gauge which also supports the new serialization
+                capabilities, please refer to the <a href="../../../../../pdk_api/samples/radar_sample/radar_panel_callback_overview.html">
+                    Radar Panel Callback Example.</a> </p>
+            <br><p><b>NOTE: </b> Data structures linked through the <a href="../../../references/gauges.html">Gauges.h</a> interface must be 4-byte aligned.</p>
             
-            <hr>
-            <h2>Gauges API Reference<a name="Gauge API Reference" id="GaugeAPIReference"></a></h2>
-            <p> You can reference gauge macros, functions, structures, and variables in the  <a href="../references/gauges_api_overview.html">API Reference</a>.</p>
-			
-            <hr>
-            
-			<h2>Gauge Tutorials<a name="Gauge Tutorials" id="GaugeTutorials"></a></h2>
-			
-			<h3>MODULE_VAR</h3>
-			Each drawing element structure has one or more  <a href="../references/gauges_api_overview.html#module_var">MODULE_VAR</a> members. 
-			You can initialize these members to one of the token variable values.
-			Graphical elements can use the MODULE_VAR structure member to determine the state in which the element will be rendered.
-			
-			<h3>SDK Sample</h3>
-			<p>The <a href="samples/c_gauge_sample/c_gauge_sample_overview.html">SDK Sample</a> example goes through the process of creating a pure C++ gauge.</p>
-			
-            <h3>Cabin Comfort</h3>
-			<p> The <a href="samples/cabin_comfort_sample/cabin_comfort_sample_overview.html">Cabin Comfort</a> example demostrates the construction of a mixed mode gauge. </p>
-			
-            
-            <hr>
-           
+			<br><h3>Running the Cabin Comfort sample<a name="Running the Cabin Comfort Sample" id="RunningtheCabinComfortSample"></a></h3>
+            <p>To get the sample to work go through the following steps:</p>
+            <ol>
+                <li>Navigate to <i>SDK/Panels Gauges User Interface/Panels/Mixed Mode Sample</i>
+				</li>
+                <li>Open up the Cabin_Comfort solution in Visual Studio, and build the project. Copy
+                    the CabinComfort.dll from the <i>Release</i> or <i>Debug</i> folder (whichever you
+                    selected to build) to the <i>Lockheed Martin\Prepar3D v4\</i> root folder. </li>
+                <li>Copy the CabinComfort.cab file to the <i>Prepar3D\Gauges</i> folder. The cabinet
+                    file simply contains the XML description of the gauge <a href="cabin_comfort_xml.html">
+                        Cabin_Comfort.xml</a>, and the background image -- <a href="stone.bmp">
+                            Stone.bmp</a>.</li>
+                <li>Either copy the sample <a href="../../samples/cabin_comfort_sample/panel.html">panel.cfg</a> file to
+                    the <i>SimObjects\Airplanes\Mooney_Bravo\panel</i> folder to add the sample gauge
+                    to the Mooney Bravo. Alternatively, to add the gauge to any other aircraft, open
+                    up the panel.cfg folder for that aircraft and add the lines shown in the following
+                    table:<br>
+                    <table class="ListTable">
+                        <tr>
+                            <td width="400">
+                                [Window titles]<br>
+                                Window00=Main Panel<br>
+                                Window01=Radio Stack<br>
+                                Window02=GPS<br>
+                                Window03=Annunciator<br>
+                                Window04=Overhead Panel<br>
+                                Window05=Mini Panel<br>
+                                <b>Window06=Cabin</b>
+                            </td>
+                            <td>
+                                Add the line in bold to the [Window titles] section, though note that the Window
+                                number (Window11 in this case) may be different.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            </td>
+                            <td>
+                                &nbsp;
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                //-- Cabin ---------------------------<br>
+                                [Window06]<br>
+                                size_mm=225,145<br>
+                                position=6<br>
+                                visible=1<br>
+                                no_luminous=1<br>
+                                gauge01=CabinComfort!CabinComfort, 0,0
+                            </td>
+                            <td>
+                                Add this entire section to the configuration file. Change the Window number if necessary.
+                            </td>
+                        </tr>
+                    </table>
+                    <br>
+                </li>
+                <li>Edit the dll.xml file. This is in the <i>%APPDATA%\Lockheed Martin\Prepar3D v4</i>
+                    folder. Add the following to dll.xml:
+                    <table class="ListTable">
+                        <tr>
+                            <td>
+                                <b>&lt;Launch.Addon&gt;<br>
+                                    &lt;Name&gt;Cabin Comfort&lt;/Name&gt;<br>
+                                    &lt;Disabled&gt;False&lt;/Disabled&gt;<br>
+                                    &lt;ManualLoad&gt;False&lt;/ManualLoad&gt;<br>
+                                    &lt;Path&gt;Cabin_Comfort.dll&lt;/Path&gt;<br>
+                                    &lt;DllStartName&gt;module_init&lt;/DllStartName&gt;<br>
+                                    &lt;DllStopName&gt;module_deinit&lt;/DllStopName&gt;<br>
+                                    &lt;/Launch.Addon&gt;</b>
+                            </td>
+                            <td>
+                                Note in particular the use of the <b>DllStartName</b> and <b>DllStopName</b> entries.
+                                These are necessary to provide the entry and exit functions to the DLL launch code
+                                of <i>Prepar3D</i>. For a description of the rest of the parameters, refer to the
+                                DLL.XML section of the <a href="../../../../../simconnect_api/simconnect_api_overview.html">SimConnect</a>
+                                documentation.
+                            </td>
+                        </tr>
+                    </table>
+                    <br>
+                </li>
+                <li>Now the sample is ready to test. Load up <i>Prepar3D</i> and select the Mooney Bravo.</li>
+                <li>From the Vehicle/Instrument Panel menu select <b>Cabin</b>, and you should see a screen
+                    similar to the following image:<br>
+                    <br>
+            </li></ol>
+            <table class="ListTable">
+                <thead>
+                    <td>
+                        <img src="../../images/cabin_comfort_mooney.jpg">
+                    </td>
+                
+            </thead></table>
+            <br><h3>Key Steps in Creating the Cabin Comfort sample <a name="Key Steps in Creating the Cabin Comfort Sample" id="KeyStepsinCreatingtheCabinComfortsample"></a></h3>
+            <p>The steps in building a gauge system combining XML and C++ can be done in a different
+                order than described here, but the following steps provide a logical process to
+                go about creating such a gauge. One of the advantages of combining XML and C++ is
+                that the gauge graphics can be created with the assistance of the ACE tool, described
+                in the <a href="../../../xml_gauges/xml_gauges_overview.html">Creating XML Gauges</a> document, which
+                considerably speeds up the trial and error process.</p>
+            <br><h4>Step 1: Create the XML component of the gauge <a name="Step 1: Create the XML component of the gauge" id="CreateXMLComponentGauge"></a> </h4>
+            <p>Use the ACE tool to help create a great looking gauge. The only parts of the XML
+                gauge that communicate with the C++ component are the evaluated strings. A name
+                for the C++ component needs to be decided upon (the word &quot;<b>CABIN</b>&quot;
+                in the sample), and also names for the variables that are going to be communicated
+                (either read or write). For the Cabin Comfort sample, the evaluated strings are
+                the following:</p>
+            <br><table class="ListTable">
+                <thead>
+                    <th>String</th>
+                    <th>Description</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <b>&lt;GaugeString&gt;%((C:CABIN:CabinTemperature))%!2.2f!&lt;/GaugeString&gt;</b>
+                        </td>
+                        <td>
+                            Displays the cabin temperature as a float, with two decimal places. Note in particular
+                            the double brackets surrounding the custom variable. The cabin temperature is set
+                            from the gauge - see the two mouse click scripts below.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>&lt;GaugeString&gt;%((C:CABIN:BankAngle))%!2.2f!&lt;/GaugeString&gt;</b>
+                        </td>
+                        <td>
+                            Displays the bank angle, again to two decimal places.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>&lt;GaugeString&gt;%((C:CABIN:FlightAttendants))%!s!&lt;/GaugeString&gt;</b>
+                        </td>
+                        <td>
+                            Displays a string indicating the current activity of the flight attendants.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>&lt;GaugeString&gt;%((C:CABIN:Restroom))%!s!&lt;/GaugeString&gt;</b>
+                        </td>
+                        <td>
+                            Displays the state of the restroom.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>&lt;GaugeString&gt;%((C:CABIN:PassengerComfort))%!3.0f!&lt;/GaugeString&gt;</b>
+                        </td>
+                        <td>
+                            Displays the Passenger Comfort setting, with no decimal places.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>&lt;Script&gt;(C:CABIN:CabinTemperature) 50 &amp;lt; if{ (C:CABIN:CabinTemperature)
+                                1 + (&amp;gt;C:CABIN:CabinTemperature) }&lt;/Script&gt;</b>
+                        </td>
+                        <td>
+                            If the cabin temperature is less than 50 degrees, 1 is added to the current temperature
+                            and the result written back to the cabin temperature variable.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>&lt;Script&gt;(C:CABIN:CabinTemperature) 0 &amp;gt; if{ (C:CABIN:CabinTemperature)
+                                1 - (&amp;gt;C:CABIN:CabinTemperature) }&lt;/Script&gt;</b>
+                        </td>
+                        <td>
+                            If the cabin temperature is greater than 0 degrees, 1 is subtracted from the current
+                            temperature and the result written back to the cabin temperature variable.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <br><p>Test and refine the XML as much as possible before coding the C++ component.</p>
+            <br><a name="Step 2: Creating a property table for the gauge variables"></a>
+            <h4>Step 2: Creating a property table for the gauge variables</h4>
+            <p>In the code snippets shown below, from the <a href="cabin_comfort.html">
+                Cabin_Comfort.cpp</a> file, note the definition of the callback name &quot;<b>CABIN</b>&quot;,
+                and the names of all the variables, exactly match those in the XML code from Step
+                1. </p>
+            <div class="codesample">
+                struct PROPERTY_TABLE<br>
+                {<br>
+                &nbsp;&nbsp;&nbsp;PCSTRINGZ szPropertyName;<br>
+                &nbsp;&nbsp;&nbsp;PCSTRINGZ szUnitsName;<br>
+                &nbsp;&nbsp;&nbsp;ENUM units;<br>
+                };<br>
+                &nbsp;&nbsp;&nbsp;<br>
+                static const char CABIN_CALLBACK_NAME[] = &quot;CABIN&quot;;<br>
+                <br>
+                static PROPERTY_TABLE CABIN_PROPERTY_TABLE[] =
+                <br>
+                {<br>
+                &nbsp;&nbsp;&nbsp;{ &quot;CabinTemperature&quot;, &quot;Celsius&quot;, UNITS_UNKNOWN},
+                <br>
+                &nbsp;&nbsp;&nbsp;{ &quot;BankAngle&quot;, &quot;Degrees&quot;, UNITS_UNKNOWN},
+                <br>
+                &nbsp;&nbsp;&nbsp;{ &quot;FlightAttendants&quot;, &quot;String&quot;, UNITS_WSTRING},
+                <br>
+                &nbsp;&nbsp;&nbsp;{ &quot;Restroom&quot;, &quot;String&quot;, UNITS_WSTRING},
+                <br>
+                &nbsp;&nbsp;&nbsp;{ &quot;PassengerComfort&quot;, &quot;Number&quot;, UNITS_UNKNOWN},<br>
+                };<br>
+                // Enum that contains the properties
+                <br>
+                enum CABIN_VAR<br>
+                {<br>
+                &nbsp;&nbsp;&nbsp;CABIN_VAR_CABIN_TEMPERATURE,<br>
+                &nbsp;&nbsp;&nbsp;CABIN_VAR_BANK_ANGLE,<br>
+                &nbsp;&nbsp;&nbsp;CABIN_VAR_FLIGHT_ATTENDANTS,<br>
+                &nbsp;&nbsp;&nbsp;CABIN_VAR_RESTROOM,<br>
+                &nbsp;&nbsp;&nbsp;CABIN_VAR_PASSENGER_COMFORT,<br>
+                };<br>
+            </div>
+            <br><a name="Step 3: Initialize the variables and  the property table"></a>
+            <h4>Step 3: Initialize the variables and the property table</h4>
+            <p>Examine the <b>CABINGaugeCallback</b> class, which inherits the <b>IGaugeCCallback</b>
+                class defined in gauges.h. The simplest way of initializing any variables is to
+                do it in the creation function of this class.</p>
+            <div class="codesample">
+                CABINGaugeCallback::CABINGaugeCallback(UINT32 containerId)<br>
+                : m_RefCount(1),<br>
+                m_containerId(containerId)<br>
+                {<br>
+                &nbsp;&nbsp;&nbsp;// Initialize aircraft variables<br>
+                &nbsp;&nbsp;&nbsp;cabin_temperature = ROOM_TEMPERATURE;<br>
+                &nbsp;&nbsp;&nbsp;flight_attendant_state = PASSIVE;<br>
+                &nbsp;&nbsp;&nbsp;restroom_state = VACANT;<br>
+                }</div>
+            <p>Notice though that the property table defined in Step 2 is initialized in the creation
+                function for <b>CABINPanelCallback</b>. If a narrow or wide string is the units of a variable,
+                set the value to <b>UNITS_STRING</b> or <b>UNITS_WSTRING</b> respectively in the property table, otherwise set it to
+                <b>UNITS_UNKNOWN</b>. The following code then finds all the unknown units and finds
+                the enumeration value for the units. This is necessary as the actual enumeration
+                values for any units are not exposed, and may change in future versions. By calling
+                <b><a href="../../../references/gauges_api_overview.html#get_units_enum">get_units_enum</a></b> this initialization code is
+                made more robust. </p>
+            <div class="codesample">
+                CABINPanelCallback::CABINPanelCallback()<br>
+                {<br>
+                &nbsp;&nbsp;&nbsp;// init property table<br>
+                &nbsp;&nbsp;&nbsp;for (int n = 0; n &lt; LENGTHOF(CABIN_PROPERTY_TABLE); n++)<br>
+                &nbsp;&nbsp;&nbsp;{<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if (ImportTable.PANELSentry.fnptr != NULL &amp;&amp;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CABIN_PROPERTY_TABLE[n].units == UNITS_UNKNOWN)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CABIN_PROPERTY_TABLE[n].units
+                = get_units_enum ( CABIN_PROPERTY_TABLE[n].szUnitsName );<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                &nbsp;&nbsp;&nbsp;}<br>
+                }</div>
+            <br><a name="Step 4: Getting and Setting variables"></a>
+            <h4>Step 4: Getting and Setting variables</h4>
+            <p>Notice there are two methods for both getting and setting property table values.
+                One method handles strings, the other numerical values. The CabinTemperature property
+                is the only one that can be set from the gauge controls in the Cabin Comfort sample,
+                and the code to do this follows:</p>
+            <div class="codesample">
+                bool CABINGaugeCallback::SetPropertyValue (SINT32 id, FLOAT64 value)<br>
+                {<br>
+                &nbsp;&nbsp;&nbsp;CABIN_VAR eCABINVar = (CABIN_VAR)id;<br>
+                &nbsp;&nbsp;&nbsp;switch(eCABINVar)<br>
+                &nbsp;&nbsp;&nbsp;{<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case CABIN_VAR_CABIN_TEMPERATURE:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;setCabinTemperature(value);<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;break;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return false;<br>
+                &nbsp;&nbsp;&nbsp;}<br>
+                &nbsp;&nbsp;&nbsp;return true;
+                <br>
+                }</div>
+            <a name="Step 5: Updating Variables"></a>
+            <br><h4>Step 5: Updating Variables</h4>
+            <p>The <b>CABINGaugeCallback::Update()</b> method is called optimally on a cycle of
+                18Hz (18 times per second), however it should be pointed out that the actual frequency
+                can be somewhat lower than this, as optimizations are made to maintain frame rates.
+                This function is the right place to put code to change variables that are not dependent
+                on a get or set call. For some gauges this method may well not contain any code
+                at all.</p>
+            <br><a name="Step 6: Handle the modules initialization and termination"></a>
+            <h4>Step 6: Handling the modules initialization and termination</h4>
+            <p>Two very important methods are<b> module_init </b>and <b>module_deinit</b>. The code
+                for these is shown below. These methods are called when the dll is created and removed
+                respectively. Notice in particular the Panels pointer, shown in bold, that is set
+                to NULL. This value is set by the DLL launch code.</p>
+            <div class="codesample">
+                void CABINPanelCallbackInit()<br>
+                {<br>
+                &nbsp;&nbsp;&nbsp;CABINPanelCallback *pPanelCallback = new CABINPanelCallback();<br>
+                &nbsp;&nbsp;&nbsp;if(pPanelCallback)<br>
+                &nbsp;&nbsp;&nbsp;{<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bool b = panel_register_c_callback(CABIN_CALLBACK_NAME,
+                pPanelCallback);<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pPanelCallback-&gt;Release();<br>
+                &nbsp;&nbsp;&nbsp;}
+                <br>
+                }<br>
+                void CABINPanelCallbackDeInit()<br>
+                {<br>
+                &nbsp;&nbsp;&nbsp;panel_register_c_callback(CABIN_CALLBACK_NAME, NULL);<br>
+                }<br>
+                <br>
+                PPANELS Panels = NULL;<br>
+                <br>
+                GAUGESIMPORT ImportTable =
+                <br>
+                {
+                <br>
+                &nbsp;&nbsp;&nbsp;{ 0x0000000F, (PPANELS)NULL },
+                <br>
+                &nbsp;&nbsp;&nbsp;{ 0x00000000, NULL }
+                <br>
+                };
+                <br>
+                <br>
+                void FSAPI module_init(void)<br>
+                {<br>
+                &nbsp;&nbsp;&nbsp;if (NULL != Panels)<br>
+                &nbsp;&nbsp;&nbsp;{<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ImportTable.PANELSentry.fnptr = (PPANELS)Panels;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CABINPanelCallbackInit();<br>
+                &nbsp;&nbsp;&nbsp;}<br>
+                }
+                <br>
+                // This is the module's export table.<br>
+                GAUGESLINKAGE Linkage =
+                <br>
+                {
+                <br>
+                &nbsp;&nbsp;&nbsp;0x00000013,
+                <br>
+                &nbsp;&nbsp;&nbsp;module_init,
+                <br>
+                &nbsp;&nbsp;&nbsp;module_deinit,
+                <br>
+                &nbsp;&nbsp;&nbsp;0,
+                <br>
+                &nbsp;&nbsp;&nbsp;0,
+                <br>
+                &nbsp;&nbsp;&nbsp;FS9LINK_VERSION, { 0 }<br>
+                };<br>
+            </div>
+            <br><a name="Step 7: Export the initialization, termination and Panels pointer correctly">
+            </a>
+            <h4>Step 7: Export the initialization, termination and Panels pointer correctly</h4>
+            <p>A key component of the gauge project is the <a href="cabin_comfort_def.html">
+                Cabin_Comfort_Def.def</a> definition file. This contains the following:</p>
+            <br><table class="ListTable">
+                <tr>
+                    <td>
+                        <b>LIBRARY &quot;Cabin_Comfort&quot;<br>
+                            EXPORTS<br>
+                            module_init<br>
+                            module_deinit<br>
+                            Panels DATA</b>
+                    </td>
+                </tr>
+            </table>
+            <br><p>This small piece is vital, as it exports the initialization and termination method
+                names in an undecorated format, and provides the pointer to the Panels data that
+                is absolutely required to be set when the dll is loaded. </p>
+            <a name="Step 8: Compile, Run and Test the DLL gauge"></a>
+            <br><h4>Step 8: Compile, Run and Test the DLL gauge </h4>
+            <p>The C++ project should compile into a dll. Follow the steps for <a href="#Running the Cabin Comfort Sample">
+                running the Cabin Comfort sample</a> to test your own gauge, including adding a
+                <b>&lt;Launch.Addon&gt;</b> section for it to the DLL.XML file. Make sure to place
+                all the different components in the correct folders.</p>
+            <div class="TopLink">
+                <a href="#top" class="TopLink">- top -</a></div>
+        </div>
+        <hr>
         <div id="footer">
         </div>
     </div>
-</div></body>
+</body>
 </html>
+
+
+
+
