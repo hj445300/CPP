@@ -97,7 +97,6 @@ public:
 	D3D11TextureInlineRenderer(std::wstring name, int width, int height);
 	~D3D11TextureInlineRenderer();
 
-	void InitTimestampQueries();
 	/* IRenderingPluginV400 */
 	virtual void Render(P3D::IRenderDataV400* pRenderData) override;
 	virtual void PreRender(P3D::IRenderDataV400* pRenderData) override;
@@ -140,10 +139,6 @@ private:
 	ShareMM* tex_ShareMM = nullptr;
 };
 
-uint32_t index = 0;
-ComPtr<ID3D11Query> mTimestampDisjoint;
-ComPtr<ID3D11Query> mTimestampStart;
-ComPtr<ID3D11Query> mTimestampEnd;
 
 
 using namespace P3D;
@@ -185,83 +180,52 @@ D3D11TextureInlineRenderer::~D3D11TextureInlineRenderer()
 
 }
 
-void D3D11TextureInlineRenderer::InitTimestampQueries()
-{
-	// Create timestamp disjoint query
-	D3D11_QUERY_DESC queryDesc;
-	queryDesc.Query = D3D11_QUERY_TIMESTAMP_DISJOINT;
-	queryDesc.MiscFlags = 0;
-	mDevice->CreateQuery(&queryDesc, &mTimestampDisjoint);
-
-	// Create timestamp start query
-	queryDesc.Query = D3D11_QUERY_TIMESTAMP;
-	mDevice->CreateQuery(&queryDesc, &mTimestampStart);
-
-	// Create timestamp end query
-	mDevice->CreateQuery(&queryDesc, &mTimestampEnd);
-}
-
+uint32_t index = 0;
 void D3D11TextureInlineRenderer::UpdateRTTTexture(unsigned char* data, uint32_t len)
 {
 	if (!mDevice) {
 		return;
 	}
 
+	//auto ret = tex_ShareMM->Read(texData, m_width * m_height * 4);
+
+	//if (ret) {
+	//	return;
+	//}
+
 	CComPtr<ID3D11DeviceContext> pDeviceContext;
 	mDevice->CreateDeferredContext(0, &pDeviceContext);
 
-	// Begin timestamp disjoint query
-	pDeviceContext->Begin(mTimestampDisjoint.Get());
-
-	// Insert start timestamp query
-	pDeviceContext->End(mTimestampStart.Get());
-
+	// Map the RTT texture
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	HRESULT hr = pDeviceContext->Map(mRTT_Texture2D.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	if (SUCCEEDED(hr)) {
-		memcpy(mappedResource.pData, data, len);
-		pDeviceContext->Unmap(mRTT_Texture2D.Get(), 0);
-	}
+	pDeviceContext->Map(mRTT_Texture2D.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 
+	// Perform the memcpy operation
+	memcpy(mappedResource.pData, data, len);
+
+	// Unmap the texture
+	pDeviceContext->Unmap(mRTT_Texture2D.Get(), 0);
+
+	// 创建新命令列表
 	ID3D11CommandList* newCommandList = nullptr;
 	pDeviceContext->FinishCommandList(FALSE, &newCommandList);
 
 	int writeIndex = currentWriteBufferIndex.load(std::memory_order_acquire);
+
+	// 替换旧的命令列表
 	if (commandBuffers[writeIndex]) {
 		commandBuffers[writeIndex]->Release();
 	}
+
 	commandBuffers[writeIndex] = newCommandList;
 
+	// 更新缓冲区索引，切换读写缓冲区
 	int oldReadIndex = currentReadBufferIndex.exchange(writeIndex, std::memory_order_acq_rel);
-	currentWriteBufferIndex.store(3 - oldReadIndex - writeIndex, std::memory_order_release);
+	currentWriteBufferIndex.store(3 - oldReadIndex - writeIndex, std::memory_order_release); // 三缓冲切换
 
 	index++;
 	auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	OutputDebugStringA(std::string("ts " + std::to_string(ts) + " index is " + std::to_string(index) + +"\n").c_str());
-
-	// Insert end timestamp query
-	pDeviceContext->End(mTimestampEnd.Get());
-
-	// End timestamp disjoint query
-	pDeviceContext->End(mTimestampDisjoint.Get());
-
-	// Get timestamp results
-	D3D11_QUERY_DATA_TIMESTAMP_DISJOINT disjointData;
-	while (pDeviceContext->GetData(mTimestampDisjoint.Get(), &disjointData, sizeof(disjointData), 0) == S_FALSE);
-
-	UINT64 startTime = 0, endTime = 0;
-	while (pDeviceContext->GetData(mTimestampStart.Get(), &startTime, sizeof(startTime), 0) == S_FALSE);
-	while (pDeviceContext->GetData(mTimestampEnd.Get(), &endTime, sizeof(endTime), 0) == S_FALSE);
-
-	if (!disjointData.Disjoint) {
-		double frequency = static_cast<double>(disjointData.Frequency);
-		double gpuTime = (endTime - startTime) / frequency * 1000.0; // GPU time in milliseconds
-		OutputDebugStringA(std::string("GPU execution time: " + std::to_string(gpuTime) + " ms\n").c_str());
-	}
-	else
-	{
-		OutputDebugStringA(std::string("GPU execution time is error!\n").c_str());
-	}
 }
 
 //--------------------------------------------------------------------------------------
@@ -295,8 +259,9 @@ void D3D11TextureInlineRenderer::Render(IRenderDataV400* pRenderData)
 		commandBuffers[readIndex] = nullptr;
 	}
 
+	// Setup the viewport
 	D3D11_VIEWPORT vp;
-	vp.Width = pRenderData->GetTextureWidth();
+	vp.Width = pRenderData->GetTextureWidth(); 
 	vp.Height = pRenderData->GetTextureHeight();
 	vp.MinDepth = 0.0f;
 	vp.MaxDepth = 1.0f;
@@ -306,7 +271,7 @@ void D3D11TextureInlineRenderer::Render(IRenderDataV400* pRenderData)
 	pDeviceContext->ClearState();
 	pDeviceContext->RSSetViewports(1, &vp);
 
-	static float ClearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	static float ClearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f }; // red,green,blue,alpha
 
 	pDeviceContext->ClearRenderTargetView(spRenderTarget.Get(), ClearColor);
 
@@ -314,10 +279,13 @@ void D3D11TextureInlineRenderer::Render(IRenderDataV400* pRenderData)
 
 	pDeviceContext->IASetInputLayout(mVertexLayout.Get());
 
-	UINT stride = sizeof(SIMPLEVERTEX);
+	// Set vertex buffer
+	UINT stride = sizeof(SIMPLEVERTEX); 
 	UINT offset = 0;
 	pDeviceContext->IASetVertexBuffers(0, 1, mVertexBuffer.GetAddressOf(), &stride, &offset);
+	// Set index buffer
 	pDeviceContext->IASetIndexBuffer(mIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+	// Set primitive topology
 	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	pDeviceContext->VSSetShader(mVertexShader.Get(), NULL, 0);
@@ -348,6 +316,7 @@ void D3D11TextureInlineRenderer::PreRender(P3D::IRenderDataV400* pRenderData)
 		return;
 	}
 
+	// Disable rendering until our device is initialized.
 	if (mDevice == NULL)
 	{
 		mRenderFlags.RenderingIsEnabled = false;
@@ -360,6 +329,7 @@ void D3D11TextureInlineRenderer::PreRender(P3D::IRenderDataV400* pRenderData)
 		return;
 	}
 
+	// Create buffer/input layout and other resources
 	if (!isExcuted)
 	{
 		if (FAILED(InitDevice(spDevice)))
@@ -368,9 +338,11 @@ void D3D11TextureInlineRenderer::PreRender(P3D::IRenderDataV400* pRenderData)
 		}
 		isExcuted = true;
 	}
-
+	
+	// Only want Render() called during the default render pass
 	mRenderFlags.RenderingIsEnabled = (pRenderData->GetRenderPass() == RenderPassDefault);
 
+	// Will not read the color render target.
 	mRenderFlags.WillReadColor = false;
 
 	pRenderData->SetRenderFlags(mRenderFlags);
@@ -537,9 +509,6 @@ HRESULT D3D11TextureInlineRenderer::InitDevice(ID3D11Device* pDevice)
 	{
 		return hr;
 	}
-
-	// 初始化时间戳查询对象
-	InitTimestampQueries();
 
 	if (!m_initDeviceSucc) {
 		m_initDeviceSucc = true;
