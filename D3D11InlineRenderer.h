@@ -142,16 +142,6 @@ private:
 uint32_t index = 0;
 ID3D11CommandList* cachedCommandList = nullptr;
 
-ComPtr<ID3D11RenderTargetView> cachedRenderTargetView = nullptr;
-D3D11_VIEWPORT cachedViewport = {};
-ComPtr<ID3D11InputLayout> cachedInputLayout = nullptr;
-ComPtr<ID3D11Buffer> cachedVertexBuffer = nullptr;
-ComPtr<ID3D11Buffer> cachedIndexBuffer = nullptr;
-ComPtr<ID3D11VertexShader> cachedVertexShader = nullptr;
-ComPtr<ID3D11PixelShader> cachedPixelShader = nullptr;
-ComPtr<ID3D11ShaderResourceView> cachedShaderResourceView = nullptr;
-ComPtr<ID3D11SamplerState> cachedSamplerState = nullptr;
-
 bool isBufferUpdated = false;
 
 using namespace P3D;
@@ -233,7 +223,7 @@ void D3D11TextureInlineRenderer::UpdateRTTTexture(unsigned char* data, uint32_t 
 		commandBuffers[writeIndex] = cachedCommandList;
 
 		int oldReadIndex = currentReadBufferIndex.exchange(writeIndex, std::memory_order_acq_rel);
-		currentWriteBufferIndex.store(3 - oldReadIndex - writeIndex, std::memory_order_release);
+		currentWriteBufferIndex.store(1 - oldReadIndex, std::memory_order_release);
 	}
 
 	index++;
