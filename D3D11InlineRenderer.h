@@ -139,7 +139,20 @@ private:
 	ShareMM* tex_ShareMM = nullptr;
 };
 
+uint32_t index = 0;
+ID3D11CommandList* cachedCommandList = nullptr;
 
+ComPtr<ID3D11RenderTargetView> cachedRenderTargetView = nullptr;
+D3D11_VIEWPORT cachedViewport = {};
+ComPtr<ID3D11InputLayout> cachedInputLayout = nullptr;
+ComPtr<ID3D11Buffer> cachedVertexBuffer = nullptr;
+ComPtr<ID3D11Buffer> cachedIndexBuffer = nullptr;
+ComPtr<ID3D11VertexShader> cachedVertexShader = nullptr;
+ComPtr<ID3D11PixelShader> cachedPixelShader = nullptr;
+ComPtr<ID3D11ShaderResourceView> cachedShaderResourceView = nullptr;
+ComPtr<ID3D11SamplerState> cachedSamplerState = nullptr;
+
+bool isBufferUpdated = false;
 
 using namespace P3D;
 
@@ -180,52 +193,57 @@ D3D11TextureInlineRenderer::~D3D11TextureInlineRenderer()
 
 }
 
-uint32_t index = 0;
 void D3D11TextureInlineRenderer::UpdateRTTTexture(unsigned char* data, uint32_t len)
 {
 	if (!mDevice) {
 		return;
 	}
 
-	//auto ret = tex_ShareMM->Read(texData, m_width * m_height * 4);
-
-	//if (ret) {
-	//	return;
-	//}
-
 	CComPtr<ID3D11DeviceContext> pDeviceContext;
 	mDevice->CreateDeferredContext(0, &pDeviceContext);
 
-	// Map the RTT texture
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	pDeviceContext->Map(mRTT_Texture2D.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-
-	// Perform the memcpy operation
-	memcpy(mappedResource.pData, data, len);
-
-	// Unmap the texture
-	pDeviceContext->Unmap(mRTT_Texture2D.Get(), 0);
-
-	// 创建新命令列表
-	ID3D11CommandList* newCommandList = nullptr;
-	pDeviceContext->FinishCommandList(FALSE, &newCommandList);
-
-	int writeIndex = currentWriteBufferIndex.load(std::memory_order_acquire);
-
-	// 替换旧的命令列表
-	if (commandBuffers[writeIndex]) {
-		commandBuffers[writeIndex]->Release();
+	// Check if pDeviceContext is null
+	if (!pDeviceContext) {
+		OutputDebugStringA("Failed to create deferred context.\n");
+		return;
 	}
 
-	commandBuffers[writeIndex] = newCommandList;
+	// 开始计时
+	auto cpuStart = std::chrono::high_resolution_clock::now();
+	OutputDebugStringA(std::string("Start UpdateRTTTexture \n").c_str());
 
-	// 更新缓冲区索引，切换读写缓冲区
-	int oldReadIndex = currentReadBufferIndex.exchange(writeIndex, std::memory_order_acq_rel);
-	currentWriteBufferIndex.store(3 - oldReadIndex - writeIndex, std::memory_order_release); // 三缓冲切换
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr = pDeviceContext->Map(mRTT_Texture2D.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (SUCCEEDED(hr)) {
+		memcpy(mappedResource.pData, data, len);
+		pDeviceContext->Unmap(mRTT_Texture2D.Get(), 0);
+		isBufferUpdated = true;
+	}
+	else {
+		isBufferUpdated = false;
+	}
+
+	pDeviceContext->FinishCommandList(FALSE, &cachedCommandList);
+
+	if (isBufferUpdated) {
+		int writeIndex = currentWriteBufferIndex.load(std::memory_order_acquire);
+		if (commandBuffers[writeIndex]) {
+			commandBuffers[writeIndex]->Release();
+		}
+		commandBuffers[writeIndex] = cachedCommandList;
+
+		int oldReadIndex = currentReadBufferIndex.exchange(writeIndex, std::memory_order_acq_rel);
+		currentWriteBufferIndex.store(3 - oldReadIndex - writeIndex, std::memory_order_release);
+	}
 
 	index++;
-	auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-	OutputDebugStringA(std::string("ts " + std::to_string(ts) + " index is " + std::to_string(index) + +"\n").c_str());
+	//auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	//OutputDebugStringA(std::string("ts " + std::to_string(ts) + " index is " + std::to_string(index) + +"\n").c_str());
+
+	// 渲染结束，计时结束
+	auto cpuEnd = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double, std::milli> cpuTime = cpuEnd - cpuStart;
+	OutputDebugStringA(std::string("CPU execution time: " + std::to_string(cpuTime.count()) + " ms\n").c_str());
 }
 
 //--------------------------------------------------------------------------------------
@@ -261,7 +279,7 @@ void D3D11TextureInlineRenderer::Render(IRenderDataV400* pRenderData)
 
 	// Setup the viewport
 	D3D11_VIEWPORT vp;
-	vp.Width = pRenderData->GetTextureWidth(); 
+	vp.Width = pRenderData->GetTextureWidth();
 	vp.Height = pRenderData->GetTextureHeight();
 	vp.MinDepth = 0.0f;
 	vp.MaxDepth = 1.0f;
@@ -280,7 +298,7 @@ void D3D11TextureInlineRenderer::Render(IRenderDataV400* pRenderData)
 	pDeviceContext->IASetInputLayout(mVertexLayout.Get());
 
 	// Set vertex buffer
-	UINT stride = sizeof(SIMPLEVERTEX); 
+	UINT stride = sizeof(SIMPLEVERTEX);
 	UINT offset = 0;
 	pDeviceContext->IASetVertexBuffers(0, 1, mVertexBuffer.GetAddressOf(), &stride, &offset);
 	// Set index buffer
@@ -297,8 +315,9 @@ void D3D11TextureInlineRenderer::Render(IRenderDataV400* pRenderData)
 
 	pDeviceContext->OMSetRenderTargets(0, NULL, NULL);
 
-	auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-	OutputDebugStringA(std::string("Bts " + std::to_string(ts) + " index is " + std::to_string(index) + +"\n").c_str());
+	//auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	//OutputDebugStringA(std::string("Bts " + std::to_string(ts) + " index is " + std::to_string(index) + +"\n").c_str());
+	OutputDebugStringA(std::string("Now render the texture \n").c_str());
 }
 
 
@@ -309,44 +328,32 @@ bool isExcuted = false;
 
 void D3D11TextureInlineRenderer::PreRender(P3D::IRenderDataV400* pRenderData)
 {
-	auto ts = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-	OutputDebugStringA(std::string("Ats " + std::to_string(ts) + " index is " + std::to_string(index) + +"\n").c_str());
-	if (!pRenderData)
-	{
+	if (!pRenderData) {
 		return;
 	}
 
-	// Disable rendering until our device is initialized.
-	if (mDevice == NULL)
-	{
+	if (mDevice == NULL) {
 		mRenderFlags.RenderingIsEnabled = false;
 		pRenderData->SetRenderFlags(mRenderFlags);
 	}
 
 	CComPtr<ID3D11Device> spDevice = pRenderData->GetDevice();
-	if (spDevice == NULL)
-	{
+	if (spDevice == NULL) {
 		return;
 	}
 
-	// Create buffer/input layout and other resources
-	if (!isExcuted)
-	{
-		if (FAILED(InitDevice(spDevice)))
-		{
+	if (!isExcuted) {
+		if (FAILED(InitDevice(spDevice))) {
 			return;
 		}
 		isExcuted = true;
 	}
-	
-	// Only want Render() called during the default render pass
+
 	mRenderFlags.RenderingIsEnabled = (pRenderData->GetRenderPass() == RenderPassDefault);
 
-	// Will not read the color render target.
 	mRenderFlags.WillReadColor = false;
 
 	pRenderData->SetRenderFlags(mRenderFlags);
-
 }
 
 
@@ -427,7 +434,6 @@ HRESULT D3D11TextureInlineRenderer::InitDevice(ID3D11Device* pDevice)
 		{ XMFLOAT3(-1.0f,  1.0f, 0.5f), XMFLOAT2(0, 1) },
 	};
 
-
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 	bd.Usage = D3D11_USAGE_DEFAULT;
@@ -481,30 +487,29 @@ HRESULT D3D11TextureInlineRenderer::InitDevice(ID3D11Device* pDevice)
 	D3D11_TEXTURE2D_DESC texDesc;
 	texDesc.Width = m_width;
 	texDesc.Height = m_height;
-	texDesc.MipLevels = 1;				// 允许的Mip等级数
-	texDesc.ArraySize = 1;				// 可以用于创建纹理数组，这里指定纹理的数目，单个纹理使用1
-	texDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;// DXGI_FORMAT_R8G8B8A8_UNORM;
-	texDesc.SampleDesc.Count = 1;		// 不使用多重采样
+	texDesc.MipLevels = 1;
+	texDesc.ArraySize = 1;
+	texDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	texDesc.SampleDesc.Count = 1;
 	texDesc.SampleDesc.Quality = 0;
 	texDesc.Usage = D3D11_USAGE_DYNAMIC;
 	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	texDesc.MiscFlags = 0;//D3D11_RESOURCE_MISC_TEXTURECUBE;	// 指定需要生成mipmap
+	texDesc.MiscFlags = 0;
 
-	hr = pDevice->CreateTexture2D(&texDesc, nullptr, mRTT_Texture2D.GetAddressOf()); //创建纹理
+	hr = pDevice->CreateTexture2D(&texDesc, nullptr, mRTT_Texture2D.GetAddressOf());
 	if (FAILED(hr))
 	{
 		return hr;
 	}
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-	srvDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;// DXGI_FORMAT_R8G8B8A8_UNORM;
+	srvDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = (UINT)-1;
 	srvDesc.Texture2D.MostDetailedMip = 0;
 
 	hr = pDevice->CreateShaderResourceView(mRTT_Texture2D.Get(), &srvDesc, mRTT_ShaderResView.GetAddressOf());
-
 	if (FAILED(hr))
 	{
 		return hr;
